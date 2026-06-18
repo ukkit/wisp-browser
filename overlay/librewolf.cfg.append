@@ -8,6 +8,15 @@
 lockPref("privacy.resistFingerprinting", true);
 lockPref("dom.security.https_only_mode", true);
 
+/** LibreWolf sets these two via plain `pref()` (not even `defaultPref`), not locked at all. Both are
+ * central to Wisp's ad-tech/cross-site-tracker threat model, found during a hardening audit pass:
+ * - contentblocking.category "strict" is the master ETP switch (third-party cookie blocking, strict
+ *   tracker lists, dFPI) — flippable back to "standard" via Settings UI or about:config otherwise.
+ * - private-attribution is Mozilla's built-in ad-measurement/attribution API (their answer to FLoC).
+ */
+lockPref("browser.contentblocking.category", "strict");
+lockPref("dom.private-attribution.submission.enabled", false);
+
 /** Re-declare the full DoH provider list with a "Mullvad (Base)" entry added, so the Settings UI
  * dropdown shows the correct name for the endpoint the DNSOverHTTPS policy sets as default.
  * This is a full re-declaration, not an append — defaultPref() replaces the whole value, and the
