@@ -45,6 +45,12 @@ OUT_DIR = Path(__file__).parent
 ICO_PATH = OUT_DIR / "wisp.ico"
 PNG_PATH = OUT_DIR / "wisp.png"
 
+# Sizes LibreWolf bakes into omni.ja as chrome/browser/content/branding/icon<N>.png
+# (the in-app wolf-logo shown on about:support, the Help menu, etc — a separate
+# asset from the .exe icon that rcedit swaps). rebrand_strings.py reads these.
+OMNI_ICON_DIR = OUT_DIR / "omni-icons"
+OMNI_ICON_SIZES = [16, 32, 48, 64, 128]
+
 
 def bezier(p0, c1, c2, p1, t):
     mt = 1 - t
@@ -121,6 +127,12 @@ def main():
     images[256].save(PNG_PATH)
     print(f"wrote {ICO_PATH} ({len(images)} sizes: {sorted(images)})")
     print(f"wrote {PNG_PATH}")
+
+    OMNI_ICON_DIR.mkdir(exist_ok=True)
+    for size in OMNI_ICON_SIZES:
+        out = OMNI_ICON_DIR / f"icon{size}.png"
+        images[size].save(out)
+        print(f"wrote {out}")
 
 
 if __name__ == "__main__":
