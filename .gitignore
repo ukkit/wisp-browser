@@ -6,3 +6,4 @@ librewolf-*/
 rcedit-x64.exe
 .venv/
 dist/
+__pycache__/
