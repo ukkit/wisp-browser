@@ -1,0 +1,20 @@
+Wisp
+
+Wisp is an independent project and is not affiliated with, endorsed by, or
+sponsored by Mozilla or the LibreWolf project.
+
+Wisp is a configuration overlay built on top of LibreWolf, an open-source
+fork of Mozilla Firefox. LibreWolf is licensed under the Mozilla Public
+License, v. 2.0 (MPL-2.0), as is Firefox itself.
+
+LibreWolf: https://librewolf.net/
+Mozilla Firefox: https://www.mozilla.org/firefox/
+
+"Firefox" and the Firefox logo are trademarks of the Mozilla Foundation.
+Wisp does not use the Firefox or Mozilla trademarks, logos, or branding.
+
+This product includes software developed by the Mozilla Foundation
+(https://www.mozilla.org/) and by the LibreWolf project
+(https://librewolf.net/), licensed under the MPL-2.0. See LICENSE for the
+full license text. Source code for the components Wisp builds upon is
+available from the LibreWolf project at https://codeberg.org/librewolf.
