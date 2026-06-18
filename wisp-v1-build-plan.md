@@ -82,7 +82,7 @@ Each task below is scoped to roughly one working day for someone new to this too
 - *Done when:* repo is up, all tools installed, LibreWolf launches locally, version number and baseline cold-start time (reboot + 3-run average) are noted.
   - **Recorded version:** LibreWolf `152.0-1`, BuildID `20260616193518` (from `librewolf-152.0-1/LibreWolf/application.ini`) — this is what `BUILD.md` (Task 11) will pin against.
   - **Baseline cold-start time:** not yet measured — pending.
-  - **Tooling confirmed installed:** VS Code, Inno Setup, 7-Zip already set up. Python via `uv venv` (uv 0.7.17, Python 3.11.3) — use `uv` for the rebrand/icon scripts' venv rather than a bare system Python install. `rcedit-x64.exe` downloaded (gitignored, not tracked in repo — see `.gitignore`). **Still pending:** VMware Workstation Player (needed for Task 10 — VirtualBox's install failed on this machine due to a driver conflict with the Virtual Machine Platform hypervisor already running WSL2/podman; see Task 10 note).
+  - **Tooling confirmed installed:** VS Code, Inno Setup, 7-Zip already set up. Python via `uv venv` (uv 0.7.17, Python 3.11.3) — use `uv` for the rebrand/icon scripts' venv rather than a bare system Python install. `rcedit-x64.exe` downloaded (gitignored, not tracked in repo — see `.gitignore`). VMware Workstation Player installed (replaces VirtualBox — see Task 10 note on the VBox/WSL2 driver conflict). **All Task 1 tooling now installed.**
 
 **Task 2 — Map the config surfaces (research day)**
 - Learn the three levers: `distribution/policies.json` (enterprise policy — what's lockable), the autoconfig `.cfg` mechanism (`lockPref` vs `defaultPref`), and `defaults/pref/*.js` (user-overridable defaults).
