@@ -1,0 +1,62 @@
+
+/** ------------------------------
+ * [WISP] Wisp overlay additions
+ * appended after LibreWolf's own librewolf.cfg content — see wisp-v1-build-plan.md Task 4.
+ * ------------------------------- */
+
+/** LibreWolf only `defaultPref`s these two — Wisp locks them so users/extensions/policies can't flip them back. */
+lockPref("privacy.resistFingerprinting", true);
+lockPref("dom.security.https_only_mode", true);
+
+/** Re-declare the full DoH provider list with a "Mullvad (Base)" entry added, so the Settings UI
+ * dropdown shows the correct name for the endpoint the DNSOverHTTPS policy sets as default.
+ * This is a full re-declaration, not an append — defaultPref() replaces the whole value, and the
+ * later defaultPref() call wins over LibreWolf's own earlier one for the same pref.
+ */
+defaultPref(
+  "doh-rollout.provider-list",
+  `[
+  {
+    "UIName": "Quad9 (No Filtering)",
+    "uri": "https://dns10.quad9.net/dns-query"
+  },
+  {
+    "UIName": "Quad9 (Malware blocking)",
+    "uri": "https://dns.quad9.net/dns-query"
+  },
+  {
+    "UIName": "LibreDNS (No Filtering)",
+    "uri": "https://doh.libredns.gr/dns-query"
+  },
+  {
+    "UIName": "LibreDNS (Adblocking)",
+    "uri": "https://doh.libredns.gr/noads"
+  },
+  {
+    "UIName": "Wikimedia DNS (No Filtering)",
+    "uri": "https://wikimedia-dns.org/dns-query"
+  },
+  {
+    "UIName": "DNS4All (No Filtering)",
+    "uri": "https://doh.dns4all.eu/dns-query"
+  },
+  {
+    "UIName": "Mullvad (No Filtering)",
+    "uri": "https://dns.mullvad.net/dns-query"
+  },
+  {
+    "UIName": "Mullvad (Base)",
+    "uri": "https://base.dns.mullvad.net/dns-query"
+  }
+]`
+);
+
+/** Repoint Help/About/update URLs at the wisp-browser repo instead of LibreWolf's own site/tracker —
+ * matches the SupportMenu repoint in distribution/policies.json.
+ */
+defaultPref("app.support.baseURL", "https://github.com/ukkit/wisp-browser");
+defaultPref("app.feedback.baseURL", "https://github.com/ukkit/wisp-browser/issues");
+defaultPref("app.releaseNotesURL", "https://github.com/ukkit/wisp-browser/releases");
+defaultPref("app.releaseNotesURL.aboutDialog", "https://github.com/ukkit/wisp-browser/releases");
+defaultPref("app.update.url.details", "https://github.com/ukkit/wisp-browser/releases");
+defaultPref("app.update.url.manual", "https://github.com/ukkit/wisp-browser/releases");

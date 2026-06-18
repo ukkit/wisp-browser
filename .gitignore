@@ -4,3 +4,5 @@ librewolf-*/
 .vscode
 .mcp.json
 rcedit-x64.exe
+.venv/
+dist/
