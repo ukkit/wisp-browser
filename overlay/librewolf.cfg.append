@@ -17,6 +17,14 @@ lockPref("dom.security.https_only_mode", true);
 lockPref("browser.contentblocking.category", "strict");
 lockPref("dom.private-attribution.submission.enabled", false);
 
+/** Always-on Private Browsing: no persistent history/cookies/cache/form data across restarts.
+ * LibreWolf ships this off (plain pref(), not locked) and deliberately hides the related Settings
+ * UI toggle since it forces "custom" history mode for everyone regardless — see the upstream
+ * comment above privacy.history.custom in librewolf.cfg. Doesn't affect bookmarks, downloads, or
+ * saved passwords, which Private Browsing mode never blocks.
+ */
+lockPref("browser.privatebrowsing.autostart", true);
+
 /** Re-declare the full DoH provider list with a "Mullvad (Base)" entry added, so the Settings UI
  * dropdown shows the correct name for the endpoint the DNSOverHTTPS policy sets as default.
  * This is a full re-declaration, not an append — defaultPref() replaces the whole value, and the
