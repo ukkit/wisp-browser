@@ -1,5 +1,7 @@
 # Wisp
 
+<img src="rebrand/icon/wisp.png" alt="Wisp logo" width="96" height="96">
+
 Wisp is a privacy-hardened config overlay on [LibreWolf](https://librewolf.net/), packaged as a self-contained Windows installer.
 
 No engine work, no recompile — Wisp takes the official LibreWolf binary, layers on additional policy/pref hardening and Wisp branding, and wraps it in an installer.
