@@ -68,6 +68,42 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Parameter
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Parameters: "-app ""browser\application.ini"""; WorkingDir: "{app}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
 
+[Registry]
+; Per-user (HKCU, matching the no-admin install) Windows default-browser
+; candidate registration — StartMenuInternet client + Capabilities +
+; RegisteredApplications. Without this, Wisp doesn't appear in Windows'
+; Default Apps page or in Wisp's own Settings > General "Make Default"
+; section at all (Firefox checks for a valid shell registration before
+; exposing that UI) — found missing during Task 10's clean-VM test, since
+; Inno doesn't write any of this on its own the way a real browser
+; installer does. Uses absolute paths (not WorkingDir-relative like the
+; shortcuts) since shell\open\command has no working-directory concept.
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}"; ValueType: string; ValueName: ""; ValueData: "{#MyAppName}"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "Wisp, a privacy-hardened browser built on LibreWolf"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities"; ValueType: string; ValueName: "ApplicationIcon"; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities"; ValueType: string; ValueName: "ApplicationName"; ValueData: "{#MyAppName}"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".htm"; ValueData: "WispHTML"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".html"; ValueData: "WispHTML"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".shtml"; ValueData: "WispHTML"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".xht"; ValueData: "WispHTML"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\FileAssociations"; ValueType: string; ValueName: ".xhtml"; ValueData: "WispHTML"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\URLAssociations"; ValueType: string; ValueName: "ftp"; ValueData: "WispURL"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\URLAssociations"; ValueType: string; ValueName: "http"; ValueData: "WispURL"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities\URLAssociations"; ValueType: string; ValueName: "https"; ValueData: "WispURL"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCU; Subkey: "Software\Clients\StartMenuInternet\{#MyAppName}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -app ""{app}\browser\application.ini"""
+
+Root: HKCU; Subkey: "Software\Classes\WispHTML"; ValueType: string; ValueName: ""; ValueData: "Wisp HTML Document"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\WispHTML\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCU; Subkey: "Software\Classes\WispHTML\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -app ""{app}\browser\application.ini"" ""%1"""
+
+Root: HKCU; Subkey: "Software\Classes\WispURL"; ValueType: string; ValueName: ""; ValueData: "Wisp URL"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\WispURL"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\WispURL\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCU; Subkey: "Software\Classes\WispURL\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" -app ""{app}\browser\application.ini"" ""%1"""
+
+Root: HKCU; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities"; Flags: uninsdeletevalue
+
 [Code]
 // Inno only removes the files it explicitly installed via [Files]; the
 // profile directory is created at runtime and survives a normal uninstall

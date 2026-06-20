@@ -19,6 +19,7 @@ LibreWolf fetch stays manual in v1 (see wisp-v1-build-plan.md Decisions) —
 this script does not download anything itself.
 """
 import argparse
+import configparser
 import datetime
 import hashlib
 import shutil
@@ -37,10 +38,12 @@ INSTALLER_SCRIPT = REPO_ROOT / "installer" / "wisp.iss"
 # build_policies.py (a one-off rebase helper, not an install-tree file) and
 # may grow more tooling later. librewolf.cfg.append is handled separately
 # below since it's appended into librewolf.cfg, not copied as its own file.
+# browser/application.ini is NOT in this list — it's generated dynamically
+# by write_application_ini() instead of copied statically, since its Version
+# field needs to be Wisp's own per-build version, not a fixed copy.
 OVERLAY_FILES = [
     "distribution/policies.json",
     "defaults/pref/wisp.js",
-    "browser/application.ini",
 ]
 CFG_APPEND = OVERLAY_DIR / "librewolf.cfg.append"
 
@@ -134,6 +137,98 @@ def apply_overlay(build_dir):
     with open(cfg_path, "a", encoding="utf-8") as f:
         f.write(CFG_APPEND.read_text(encoding="utf-8"))
     print("  librewolf.cfg.append -> librewolf.cfg (appended)")
+
+
+def read_librewolf_app_info(app_dir):
+    """Reads the source build's own top-level application.ini (the unused
+    stub LibreWolf ships — see Task 4) for the fields that must track the
+    actual LibreWolf build being packaged: Version, BuildID, SourceRepository,
+    SourceStamp, ID, and Gecko Min/MaxVersion. Read dynamically rather than
+    hardcoded, so a future LibreWolf rebase doesn't leave these stale in a
+    static overlay file the way browser/application.ini used to be.
+    """
+    parser = configparser.ConfigParser()
+    parser.read(app_dir / "application.ini", encoding="utf-8")
+    return {
+        "version": parser["App"]["Version"],
+        "build_id": parser["App"]["BuildID"],
+        "source_repository": parser["App"]["SourceRepository"],
+        "source_stamp": parser["App"]["SourceStamp"],
+        "id": parser["App"]["ID"],
+        "gecko_min_version": parser["Gecko"]["MinVersion"],
+        "gecko_max_version": parser["Gecko"]["MaxVersion"],
+    }
+
+
+def write_application_ini(build_dir, librewolf_info):
+    """Generates browser/application.ini (the one Gecko actually loads, via
+    -app "browser\\application.ini" — see Task 4) with Wisp's own identity,
+    but the *actual* LibreWolf engine version — not Wisp's own build version.
+
+    Tried setting this to Wisp's own version first; reverted after discovering
+    the About dialog's displayed version doesn't even read this field at
+    runtime — it reads AppConstants.MOZ_APP_VERSION_DISPLAY, a constant
+    compiled into LibreWolf's own build, which this overlay-only project
+    cannot change without recompiling (out of scope per the project's "no
+    engine work" constraint). Setting Version here to anything other than the
+    real engine version would just risk a mismatch against that compiled
+    constant for zero visible benefit. Wisp's own build version is shown via
+    distribution.ini instead (see write_distribution_ini), which *is* read at
+    runtime via Services.prefs.
+    """
+    print(f"writing browser/application.ini (LibreWolf version {librewolf_info['version']})")
+    ini_path = build_dir / "browser" / "application.ini"
+    ini_path.parent.mkdir(parents=True, exist_ok=True)
+    ini_path.write_text(
+        "[App]\n"
+        "Vendor=Wisp\n"
+        "Name=Wisp\n"
+        "RemotingName=wisp\n"
+        f"Version={librewolf_info['version']}\n"
+        "Profile=Wisp\n"
+        f"BuildID={librewolf_info['build_id']}\n"
+        f"SourceRepository={librewolf_info['source_repository']}\n"
+        f"SourceStamp={librewolf_info['source_stamp']}\n"
+        f"ID={librewolf_info['id']}\n"
+        "\n"
+        "[Gecko]\n"
+        f"MinVersion={librewolf_info['gecko_min_version']}\n"
+        f"MaxVersion={librewolf_info['gecko_max_version']}\n"
+        "\n"
+        "[XRE]\n"
+        "EnableProfileMigrator=1\n",
+        encoding="utf-8",
+    )
+
+
+def write_distribution_ini(build_dir, wisp_version):
+    """distribution/distribution.ini doesn't exist upstream — adding it (not
+    overwriting anything) is the only runtime-readable place left to surface
+    Wisp's own build version in the About dialog, since application.ini's
+    Version field can't be repurposed for this (see write_application_ini) —
+    the dialog's main version line is a compiled constant, but its
+    #distributionId label reads distribution.id/.version via Services.prefs
+    at runtime, which this file does populate.
+
+    Format is INI, not JSON — confirmed by reading modules/distribution.sys.mjs
+    inside omni.ja. That module's applyPrefDefaults() requires id, version,
+    AND about to all be present under [Global] — if any one is missing, the
+    whole customization step bails out before setting distribution.id at all
+    (verified by reading the actual shipped logic, not just guessing from the
+    omitted-key idea tried first). So id and version must be separate keys
+    rather than baking "Wisp v<version>" into id alone. aboutDialog.js then
+    renders distributionId as "<id> - <version>", and the about text as a
+    second, always-shown line.
+    """
+    print(f"writing distribution.ini (Wisp v{wisp_version})")
+    ini_path = build_dir / "distribution" / "distribution.ini"
+    ini_path.write_text(
+        "[Global]\n"
+        "id=Wisp\n"
+        f"version={wisp_version}\n"
+        "about=Wisp, a privacy-hardened browser built on LibreWolf\n",
+        encoding="utf-8",
+    )
 
 
 def run_rebrand(build_dir):
@@ -238,10 +333,14 @@ def main():
     rcedit_path = find_rcedit(args.rcedit)
     output_dir = Path(args.output_dir).resolve()
 
+    librewolf_info = read_librewolf_app_info(app_dir)
+
     build_dir = Path(tempfile.mkdtemp(prefix="wisp-build-"))
     try:
         copy_source(app_dir, build_dir)
         apply_overlay(build_dir)
+        write_application_ini(build_dir, librewolf_info)
+        write_distribution_ini(build_dir, args.version)
         run_rebrand(build_dir)
         rebrand_exe(build_dir, rcedit_path)
         setup_exe = compile_installer(build_dir, args.version, output_dir, iscc_path)
