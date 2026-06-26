@@ -89,7 +89,7 @@ def confirm_and_publish(version, exe, sha256_file, lw_version):
     answer = input(f"Push v{version} to GitHub as a public release? [y/N] ").strip().lower()
     if answer != "y":
         print("Aborted.")
-        sys.exit(0)
+        sys.exit(1)
 
     confirm = input(f"Type the version to confirm ({version}): ").strip()
     if confirm != version:
@@ -97,16 +97,17 @@ def confirm_and_publish(version, exe, sha256_file, lw_version):
         sys.exit(1)
 
     print(f"\nPublishing v{version} to {REPO}...")
-    subprocess.run(
+    result = subprocess.run(
         [
             "gh", "release", "create", f"v{version}",
             str(exe), str(sha256_file),
             "--repo", REPO,
             "--title", f"Wisp {version}",
             "--notes", f"Built on LibreWolf {lw_version}.",
-        ],
-        check=True,
+        ]
     )
+    if result.returncode != 0:
+        sys.exit(f"error: gh release create failed (exit {result.returncode}).")
     print(f"\nDone. https://github.com/{REPO}/releases/tag/v{version}")
 
 
