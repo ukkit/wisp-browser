@@ -105,6 +105,25 @@ Root: HKCU; Subkey: "Software\Classes\WispURL\shell\open\command"; ValueType: st
 Root: HKCU; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities"; Flags: uninsdeletevalue
 
 [Code]
+// Kill any running librewolf.exe before file extraction so in-place upgrades
+// reliably overwrite all files. Without this, /SILENT suppresses Inno's
+// "please close the app" dialog and locked files (xul.dll, librewolf.cfg, etc.)
+// are silently skipped, leaving the old installation partially in place.
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+begin
+  if CurStep = ssInstall then
+  begin
+    Exec('taskkill.exe', '/F /IM librewolf.exe', '', SW_HIDE,
+         ewWaitUntilTerminated, ResultCode);
+    // taskkill exits before the OS finishes releasing memory-mapped handles
+    // (xul.dll, librewolf.exe). Wait 2 s so the kernel cleanup completes
+    // before Inno Setup tries to overwrite those files.
+    Sleep(2000);
+  end;
+end;
+
 // Inno only removes the files it explicitly installed via [Files]; the
 // profile directory is created at runtime and survives a normal uninstall
 // (browser data isn't something to delete silently by default). Ask once,
