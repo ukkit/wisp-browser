@@ -84,3 +84,38 @@ defaultPref("app.releaseNotesURL", "https://github.com/ukkit/wisp-browser/releas
 defaultPref("app.releaseNotesURL.aboutDialog", "https://github.com/ukkit/wisp-browser/releases");
 defaultPref("app.update.url.details", "https://github.com/ukkit/wisp-browser/releases");
 defaultPref("app.update.url.manual", "https://github.com/ukkit/wisp-browser/releases");
+
+/** Explicitly place all 4 bundled extensions in the nav-bar on a fresh profile.
+ * The policy default_area:"navbar" only works for extensions whose manifest already
+ * declares default_area — Bitwarden and Clear Cache don't, so they fall to
+ * unified-extensions-area. Bundled XPIs ensure all widgets are registered before
+ * CustomizableUI initialises, so this defaultPref placement is applied on first launch.
+ * Widget IDs: extension ID with non-alphanumeric/non-hyphen chars replaced by "_", lowercased.
+ */
+defaultPref("browser.uiCustomization.state", JSON.stringify({
+  placements: {
+    "widget-overflow-fixed-list": [],
+    "unified-extensions-area": [],
+    "nav-bar": [
+      "back-button",
+      "forward-button",
+      "stop-reload-button",
+      "customizableui-special-spring1",
+      "vertical-spacer",
+      "urlbar-container",
+      "customizableui-special-spring2",
+      "downloads-button",
+      "fxa-toolbar-menu-button",
+      "reset-pbm-toolbar-button",
+      "unified-extensions-button",
+      "ublock0_raymondhill_net-browser-action",
+      "sponsorblocker_ajay_app-browser-action",
+      "clearcache_michel_de_almeida-browser-action",
+      "_446900e4-71c2-419f-a6a7-df9c091e268b_-browser-action"
+    ],
+    "toolbar-menubar": ["menubar-items"],
+    "TabsToolbar": ["tabbrowser-tabs", "new-tab-button", "alltabs-button"],
+    "vertical-tabs": [],
+    "PersonalToolbar": ["personal-bookmarks"]
+  }
+}));

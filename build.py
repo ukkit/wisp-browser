@@ -44,6 +44,10 @@ INSTALLER_SCRIPT = REPO_ROOT / "installer" / "wisp.iss"
 OVERLAY_FILES = [
     "distribution/policies.json",
     "defaults/pref/wisp.js",
+    "distribution/extensions/uBlock0@raymondhill.net.xpi",
+    "distribution/extensions/sponsorBlocker@ajay.app.xpi",
+    "distribution/extensions/{446900e4-71c2-419f-a6a7-df9c091e268b}.xpi",
+    "distribution/extensions/clearcache@michel.de.almeida.xpi",
 ]
 CFG_APPEND = OVERLAY_DIR / "librewolf.cfg.append"
 
@@ -246,6 +250,7 @@ def run_rebrand(build_dir):
     print(f"  icons replaced: {report['icons_replaced']}")
     print(f"  aboutDialog.css icon: {report['css_icon_replaced']}")
     print(f"  aboutDialog website link: {report['website_link_replaced']}")
+    print(f"  newtab background injected: {report['newtab_bg_injected']}")
     if unexpected:
         sys.exit("error: rebrand found unexpected results:\n  " + "\n  ".join(unexpected))
 
