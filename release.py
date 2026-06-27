@@ -2,9 +2,12 @@
 import argparse
 import configparser
 import datetime
+import os
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 REPO = "ukkit/wisp-browser"
@@ -64,7 +67,7 @@ def run_build(args):
     return exe, sha256_file
 
 
-def get_librewolf_version(librewolf_dir):
+def get_librewolf_info(librewolf_dir):
     app_dir = Path(librewolf_dir).resolve()
     if not (app_dir / "application.ini").exists():
         nested = app_dir / "LibreWolf" / "application.ini"
@@ -72,10 +75,92 @@ def get_librewolf_version(librewolf_dir):
             app_dir = app_dir / "LibreWolf"
     cfg = configparser.ConfigParser()
     cfg.read(app_dir / "application.ini")
-    return cfg.get("App", "Version", fallback="unknown")
+    return {
+        "version": cfg.get("App", "Version", fallback="unknown"),
+        "build_id": cfg.get("App", "BuildID", fallback="unknown"),
+    }
 
 
-def confirm_and_publish(version, exe, sha256_file, lw_version):
+def edit_release_notes(version, lw_version):
+    """Pre-fill release notes with git log since last tag, open editor, return result."""
+    last_tag = subprocess.run(
+        ["git", "describe", "--tags", "--abbrev=0"],
+        capture_output=True, text=True, cwd=REPO_ROOT,
+    )
+    if last_tag.returncode == 0:
+        since = last_tag.stdout.strip()
+        log = subprocess.run(
+            ["git", "log", f"{since}..HEAD", "--oneline"],
+            capture_output=True, text=True, cwd=REPO_ROOT,
+        ).stdout.strip()
+    else:
+        log = subprocess.run(
+            ["git", "log", "--oneline", "-20"],
+            capture_output=True, text=True, cwd=REPO_ROOT,
+        ).stdout.strip()
+
+    draft = (
+        f"Built on LibreWolf {lw_version}.\n\n"
+        f"## Changes\n\n"
+        f"{log}\n"
+    )
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".md", delete=False, encoding="utf-8"
+    ) as f:
+        f.write(draft)
+        tmp = f.name
+
+    editor = os.environ.get("EDITOR") or os.environ.get("VISUAL") or "notepad"
+    subprocess.run([editor, tmp])
+
+    notes = Path(tmp).read_text(encoding="utf-8").strip()
+    Path(tmp).unlink(missing_ok=True)
+    return notes
+
+
+def update_docs(version, lw_info):
+    """Update the pinned version references in README.md and docs/BUILD.md."""
+    release_url = f"https://github.com/{REPO}/releases/tag/v{version}"
+
+    readme = REPO_ROOT / "README.md"
+    content = readme.read_text(encoding="utf-8")
+    content = re.sub(
+        r"(?:v1 \(Windows\) is in development[^\n]*|Latest release:[^\n]*)",
+        f"Latest release: [v{version}]({release_url}) — built on LibreWolf {lw_info['version']}.",
+        content,
+    )
+    readme.write_text(content, encoding="utf-8")
+
+    build_md = REPO_ROOT / "docs" / "BUILD.md"
+    content = build_md.read_text(encoding="utf-8")
+    content = re.sub(
+        r"This repo is currently built and verified against \*\*LibreWolf `[^`]+`\*\* \(BuildID `[^`]+`\)\.",
+        f"This repo is currently built and verified against **LibreWolf `{lw_info['version']}`** (BuildID `{lw_info['build_id']}`).",
+        content,
+    )
+    build_md.write_text(content, encoding="utf-8")
+
+
+def commit_docs(version):
+    """Commit README.md and docs/BUILD.md if they changed."""
+    changed = subprocess.run(
+        ["git", "diff", "--quiet", "README.md", "docs/BUILD.md"],
+        cwd=REPO_ROOT,
+    ).returncode != 0
+    if not changed:
+        return
+    subprocess.run(
+        ["git", "add", "README.md", "docs/BUILD.md"],
+        cwd=REPO_ROOT, check=True,
+    )
+    subprocess.run(
+        ["git", "commit", "-m", f"Update docs for Wisp {version} release"],
+        cwd=REPO_ROOT, check=True,
+    )
+
+
+def confirm_and_publish(version, exe, sha256_file, lw_version, notes):
     size_mb = exe.stat().st_size / 1024 / 1024
     sha256 = sha256_file.read_text(encoding="utf-8").split()[0]
     print(f"\n{'=' * 62}")
@@ -103,7 +188,7 @@ def confirm_and_publish(version, exe, sha256_file, lw_version):
             str(exe), str(sha256_file),
             "--repo", REPO,
             "--title", f"Wisp {version}",
-            "--notes", f"Built on LibreWolf {lw_version}.",
+            "--notes", notes,
         ]
     )
     if result.returncode != 0:
@@ -115,6 +200,9 @@ if __name__ == "__main__":
     args = parse_args()
     check_gh()
     check_no_existing_release(args.version)
+    lw_info = get_librewolf_info(args.librewolf_dir)
+    notes = edit_release_notes(args.version, lw_info["version"])
     exe, sha256_file = run_build(args)
-    lw_version = get_librewolf_version(args.librewolf_dir)
-    confirm_and_publish(args.version, exe, sha256_file, lw_version)
+    confirm_and_publish(args.version, exe, sha256_file, lw_info["version"], notes)
+    update_docs(args.version, lw_info)
+    commit_docs(args.version)
