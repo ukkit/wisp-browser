@@ -8,3 +8,4 @@ rcedit-x64.exe
 .venv/
 dist/
 __pycache__/
+.superpowers/
