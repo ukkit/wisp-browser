@@ -1,5 +1,4 @@
 // Wisp unlocked defaults — user-editable, unlike the lockPref() additions in librewolf.cfg.append.
-// See wisp-v1-build-plan.md Task 4: DoH provider is the only Wisp setting left unlocked.
 //
 // Mirrors the DNSOverHTTPS policy's ProviderURL (distribution/policies.json) as the default-branch
 // value, so the Settings UI shows the right provider selected even before policy enforcement applies,

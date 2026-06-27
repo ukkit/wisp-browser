@@ -1,7 +1,7 @@
 
 /** ------------------------------
  * [WISP] Wisp overlay additions
- * appended after LibreWolf's own librewolf.cfg content — see wisp-v1-build-plan.md Task 4.
+ * appended after LibreWolf's own librewolf.cfg content.
  * ------------------------------- */
 
 /** LibreWolf only `defaultPref`s these two — Wisp locks them so users/extensions/policies can't flip them back. */

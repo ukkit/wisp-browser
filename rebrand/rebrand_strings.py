@@ -3,8 +3,7 @@ strings, swaps the in-app wolf-logo PNGs, and swaps the inline base64 wolf-logo
 SVG embedded directly in aboutDialog.css.
 
 Text scope (confirmed by auditing every case-sensitive "LibreWolf" occurrence
-in the 152.0-1 omni.ja — see wisp-v1-build-plan.md Task 7, and the follow-up
-audit after the About window was found still showing LibreWolf text/icon):
+in the 152.0-1 omni.ja:
   - chrome/<locale>/locale/branding/brand.dtd            (104 files)
   - chrome/<locale>/locale/branding/brand.properties     (104 files)
   - localization/<locale>/branding/brand.ftl             (104 files)
@@ -93,6 +92,9 @@ ABOUT_DIALOG_CSS = "chrome/browser/content/browser/aboutDialog.css"
 WISP_SVG = Path(__file__).parent / "icon" / "wisp.svg"
 DATA_URI_RE = re.compile(r'(url\("data:image/svg\+xml;base64,)([A-Za-z0-9+/=]+)("\))')
 
+NEWTAB_CSS = "chrome/browser/builtin-addons/newtab/data/css/activity-stream.css"
+SOCIAL_PREVIEW = Path(__file__).parent / "icon" / "social-preview.png"
+
 # aboutDialog.xhtml's website link is a literal hardcoded URL (lowercase
 # "librewolf.net", so the case-sensitive LibreWolf->Wisp text pass correctly
 # leaves it alone) used as both the href and its own visible link text — not
@@ -116,6 +118,17 @@ def patch_about_dialog_css(data):
     return new_text.encode("utf-8"), count
 
 
+def inject_newtab_bg_css(data):
+    png_b64 = base64.b64encode(SOCIAL_PREVIEW.read_bytes()).decode()
+    suffix = (
+        "\n/* Wisp: branded new-tab background */\n"
+        f"html{{background:#2a2d6e url('data:image/png;base64,{png_b64}')"
+        "center/cover no-repeat fixed!important}}\n"
+        "body,.outer-wrapper{background:transparent!important}\n"
+    )
+    return data + suffix.encode("utf-8")
+
+
 def rebrand_zip(src_path, dst_path):
     report = {
         "files_patched": 0,
@@ -124,6 +137,7 @@ def rebrand_zip(src_path, dst_path):
         "icons_replaced": 0,
         "css_icon_replaced": 0,
         "website_link_replaced": 0,
+        "newtab_bg_injected": 0,
     }
     unexpected = []
 
@@ -166,6 +180,9 @@ def rebrand_zip(src_path, dst_path):
                             f"{ABOUT_DIALOG_CSS}: expected 1 data-URI replacement, made {count}"
                         )
                     report["css_icon_replaced"] += count
+                elif item.filename == NEWTAB_CSS:
+                    data = inject_newtab_bg_css(data)
+                    report["newtab_bg_injected"] += 1
                 zout.writestr(item, data)
 
     for pattern, expected in PATTERN_EXPECTED_COUNTS.items():
@@ -178,6 +195,8 @@ def rebrand_zip(src_path, dst_path):
         )
     if ABOUT_DIALOG_CSS not in all_names:
         unexpected.append(f"{ABOUT_DIALOG_CSS} not found in archive")
+    if report["newtab_bg_injected"] != 1:
+        unexpected.append(f"{NEWTAB_CSS}: expected 1 injection, got {report['newtab_bg_injected']}")
 
     return report, unexpected
 

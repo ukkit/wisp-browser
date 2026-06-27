@@ -15,8 +15,7 @@ subfolder inside the downloaded portable distribution, not the top-level
 portable-mode folder. If pointed at the top-level folder by mistake, this
 script auto-detects and descends into the nested LibreWolf/ subfolder.
 
-LibreWolf fetch stays manual in v1 (see wisp-v1-build-plan.md Decisions) —
-this script does not download anything itself.
+LibreWolf fetch is manual — this script does not download anything itself.
 """
 import argparse
 import configparser
@@ -111,7 +110,7 @@ def find_rcedit(override):
         return default
     sys.exit(
         f"error: rcedit-x64.exe not found at {default} — "
-        "download it (see wisp-v1-build-plan.md Task 1) or pass --rcedit"
+        "download it from https://github.com/electron/rcedit/releases or pass --rcedit"
     )
 
 

@@ -14,7 +14,7 @@ LibreWolf fetch is manual in v1 — this repo does not download anything itself.
 1. Download the **portable/zip** Windows build from [librewolf.net/installation/windows](https://librewolf.net/installation/windows/).
 2. Extract it anywhere.
 
-This repo is currently built and verified against **LibreWolf `152.0-1`** (BuildID `20260616193518`). A newer LibreWolf release may need overlay adjustments — check `wisp-v1-build-plan.md` before assuming a newer build works unmodified.
+This repo is currently built and verified against **LibreWolf `152.0-1`** (BuildID `20260616193518`). A newer LibreWolf release may need overlay adjustments — review the overlay files before assuming a newer build works unmodified.
 
 ## Build
 

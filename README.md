@@ -3,32 +3,23 @@
   WISP
 </h1>
 
-Wisp is a privacy-hardened config overlay on [LibreWolf](https://librewolf.net/), packaged as a self-contained Windows installer.
+Wisp is a privacy-hardened browser built for personal use — a config overlay on [LibreWolf](https://librewolf.net/), packaged as a self-contained Windows installer.
 
-No engine work, no recompile — Wisp takes the official LibreWolf binary, layers on additional policy/pref hardening and Wisp branding, and wraps it in an installer.
+No engine work, no recompile. Wisp takes the official LibreWolf binary, layers on additional hardening and Wisp branding, and wraps it in an installer.
 
-## Status
+## What it does
 
-v1 (Windows) is in development. See [`wisp-v1-build-plan.md`](wisp-v1-build-plan.md) for the build plan.
-
-## Privacy posture
-
-- **DNS-level content blocking**, on by default via DNS-over-HTTPS to [Mullvad's base resolver](https://mullvad.net/en/help/dns-over-https-and-dns-over-tls) (ad, tracker, and malware blocking). No in-browser ad blocker.
-  - **Tradeoff:** this means Mullvad sees Wisp's DNS queries by default. Change it in `Settings → Privacy & Security → DNS over HTTPS` — point it at your own pi-hole/dns0 instance, or pick a different provider from the dropdown.
-- Fingerprinting resistance (LibreWolf's `resistFingerprinting`) and HTTPS-only mode are locked on, not just defaulted.
+- **DNS-level content blocking** via DNS-over-HTTPS to [Mullvad's base resolver](https://mullvad.net/en/help/dns-over-https-and-dns-over-tls) (ads, trackers, malware). Change it in `Settings → Privacy & Security → DNS over HTTPS`.
+- Fingerprinting resistance and HTTPS-only mode are locked on.
 - Telemetry, Firefox Studies, and Pocket are disabled.
-- All extension/theme/dictionary installs are blocked (DNS-level blocking only — no in-browser blocker, no exceptions).
+- **4 extensions pre-installed:** [uBlock Origin](https://ublockorigin.com/), [SponsorBlock](https://sponsor.ajay.app/), [Bitwarden](https://bitwarden.com/), [Clear Cache](https://addons.mozilla.org/en-US/firefox/addon/clearcache/). No other extension installation is permitted.
 
-## Security updates
-
-Wisp does not auto-update in v1. We commit to a manual rebuild-and-release **within 72 hours** of each upstream LibreWolf security release.
-
-## Known limits (v1)
+## Known limits
 
 - No per-site exceptions UI.
-- Some sites may break due to the blanket extension-install block.
-- The installer is **unsigned** — Windows SmartScreen will warn on first run ("Windows protected your PC"). Click **More info → Run anyway** to proceed. Code signing is being evaluated for a future release (no committed date).
-  - To verify the download instead of trusting the warning: each release publishes a `.sha256` checksum file alongside the installer. Verify with `Get-FileHash Wisp-Setup-<version>.exe -Algorithm SHA256` and compare against the first field of the matching `.sha256` file.
+- Some sites may break due to the extension-install block.
+- Installer is **unsigned** — SmartScreen will warn on first run. Click **More info → Run anyway**. Each release includes a `.sha256` checksum for manual verification.
+- No auto-updates. Security releases are rebuilt within 72 hours of upstream.
 
 ## Building from source
 
