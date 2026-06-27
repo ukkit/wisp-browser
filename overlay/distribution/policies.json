@@ -24,8 +24,24 @@
         },
         "ExtensionSettings": {
             "*": {
-                "blocked_install_message": "Wisp blocks all add-on installs by design — content blocking is handled at the DNS level, not in-browser.",
+                "blocked_install_message": "Wisp ships with a curated set of extensions. Additional add-on installs are not permitted.",
                 "installation_mode": "blocked"
+            },
+            "uBlock0@raymondhill.net": {
+                "installation_mode": "force_installed",
+                "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+            },
+            "sponsorBlocker@ajay.app": {
+                "installation_mode": "force_installed",
+                "install_url": "https://addons.mozilla.org/firefox/downloads/latest/sponsorblock/latest.xpi"
+            },
+            "{446900e4-71c2-419f-a6a7-df9c091e268b}": {
+                "installation_mode": "force_installed",
+                "install_url": "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi"
+            },
+            "clearcache@michel.de.almeida": {
+                "installation_mode": "force_installed",
+                "install_url": "https://addons.mozilla.org/firefox/downloads/latest/clearcache/latest.xpi"
             }
         },
         "SearchEngines": {

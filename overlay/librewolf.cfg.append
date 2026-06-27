@@ -8,6 +8,13 @@
 lockPref("privacy.resistFingerprinting", true);
 lockPref("dom.security.https_only_mode", true);
 
+/** First-Party Isolation: partitions cookies, cache, HSTS state, localStorage, IndexedDB, and all
+ * other browser state by the top-level (first-party) domain. Extends ETP strict's Total Cookie
+ * Protection (which covers third-party cookies) to also cover cache-timing and HSTS supercookie
+ * vectors that TCP misses. Trade-off: breaks cross-origin SSO and some OAuth flows.
+ */
+lockPref("privacy.firstparty.isolate", true);
+
 /** LibreWolf sets these two via plain `pref()` (not even `defaultPref`), not locked at all. Both are
  * central to Wisp's ad-tech/cross-site-tracker threat model, found during a hardening audit pass:
  * - contentblocking.category "strict" is the master ETP switch (third-party cookie blocking, strict
