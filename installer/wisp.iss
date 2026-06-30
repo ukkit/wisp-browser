@@ -109,6 +109,24 @@ Root: HKCU; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueN
 // reliably overwrite all files. Without this, /SILENT suppresses Inno's
 // "please close the app" dialog and locked files (xul.dll, librewolf.cfg, etc.)
 // are silently skipped, leaving the old installation partially in place.
+// Delete all Wisp-Wisp-* and Mozilla-LibreWolf-* entries from the startup Run
+// key. The browser writes these itself (keyed by install-path hash) when "Open
+// on startup" is enabled; stale entries from old or test installs accumulate
+// and cause multiple browser instances on reboot. The browser re-registers the
+// correct entry on first launch after this install completes.
+procedure CleanStaleStartupEntries();
+var
+  RunKey: String;
+  Names: TArrayOfString;
+  I: Integer;
+begin
+  RunKey := 'Software\Microsoft\Windows\CurrentVersion\Run';
+  if RegGetValueNames(HKCU, RunKey, Names) then
+    for I := 0 to GetArrayLength(Names) - 1 do
+      if (Pos('Wisp-Wisp-', Names[I]) = 1) or (Pos('Mozilla-LibreWolf-', Names[I]) = 1) then
+        RegDeleteValue(HKCU, RunKey, Names[I]);
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   ResultCode: Integer;
@@ -121,6 +139,7 @@ begin
     // (xul.dll, librewolf.exe). Wait 2 s so the kernel cleanup completes
     // before Inno Setup tries to overwrite those files.
     Sleep(2000);
+    CleanStaleStartupEntries();
   end;
 end;
 
