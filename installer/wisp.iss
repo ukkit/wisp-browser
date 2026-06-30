@@ -105,6 +105,24 @@ Root: HKCU; Subkey: "Software\Classes\WispURL\shell\open\command"; ValueType: st
 Root: HKCU; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\Clients\StartMenuInternet\{#MyAppName}\Capabilities"; Flags: uninsdeletevalue
 
 [Code]
+// If a previous Wisp install (e.g. a test install at C:\Temp\WispVerify) left
+// its uninstall registry entry behind, Inno reads it at startup and treats
+// that path as the upgrade target — silently updating the wrong directory.
+// Delete any AppId registration that doesn't point to the canonical install
+// path before Inno gets a chance to read it.
+function InitializeSetup(): Boolean;
+var
+  UninstKey: String;
+  InstallLocation: String;
+begin
+  Result := True;
+  UninstKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
+               '{B6E6E6C0-6E6E-4B0F-9C9A-77B6F1B6E6C0}_is1';
+  if RegQueryStringValue(HKCU, UninstKey, 'InstallLocation', InstallLocation) then
+    if CompareText(InstallLocation, ExpandConstant('{localappdata}\Wisp\')) <> 0 then
+      RegDeleteKeyIncludingSubkeys(HKCU, UninstKey);
+end;
+
 // Kill any running librewolf.exe before file extraction so in-place upgrades
 // reliably overwrite all files. Without this, /SILENT suppresses Inno's
 // "please close the app" dialog and locked files (xul.dll, librewolf.cfg, etc.)
