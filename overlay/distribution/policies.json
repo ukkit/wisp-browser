@@ -1,19 +1,35 @@
 {
     "__COMMENT__ More Information": "https://github.com/mozilla/policy-templates/blob/master/README.md",
     "policies": {
+        "AIControls": {
+            "Translations": {
+                "Value": "available"
+            },
+            "PDFAltText": {
+                "Value": "blocked"
+            },
+            "SmartTabGroups": {
+                "Value": "blocked"
+            },
+            "LinkPreviewKeyPoints": {
+                "Value": "blocked"
+            },
+            "SidebarChatbot": {
+                "Value": "blocked"
+            },
+            "SmartWindow": {
+                "Value": "blocked"
+            }
+        },
         "AppUpdateURL": "https://localhost",
         "DisableAppUpdate": true,
-        "OverrideFirstRunPage": "",
-        "OverridePostUpdatePage": "",
-        "DisableProfileImport": true,
-        "DisableFirefoxStudies": true,
-        "DisableTelemetry": true,
+        "DisableDefaultBrowserAgent": true,
         "DisableFeedbackCommands": true,
-        "DisablePocket": true,
+        "DisableFirefoxStudies": true,
+        "DisableRemoteImprovements": true,
         "DisableSetDesktopBackground": true,
-        "DisableDeveloperTools": false,
-        "NoDefaultBookmarks": true,
-        "DefaultSerialGuardSetting": 3,
+        "DisableTelemetry": true,
+        "DontCheckDefaultBrowser": true,
         "WebsiteFilter": {
             "Block": [
                 "https://localhost/*"
@@ -21,6 +37,9 @@
             "Exceptions": [
                 "https://localhost/*"
             ]
+        },
+        "EncryptedMediaExtensions": {
+            "Enabled": false
         },
         "ExtensionSettings": {
             "*": {
@@ -51,6 +70,49 @@
                 "default_area": "navbar",
                 "private_browsing": true
             }
+        },
+        "FirefoxHome": {
+            "Weather": false,
+            "TopSites": false,
+            "SponsoredTopSites": false,
+            "Highlights": false,
+            "Stories": false,
+            "SponsoredStories": false
+        },
+        "FirefoxSuggest": {
+            "WebSuggestions": false,
+            "SponsoredSuggestions": false,
+            "ImproveSuggest": false
+        },
+        "HttpsOnlyMode": "enabled",
+        "LocalNetworkAccess": {
+            "Enabled": true,
+            "BlockTrackers": true,
+            "EnablePrompting": true
+        },
+        "NoDefaultBookmarks": true,
+        "OverridePostUpdatePage": "",
+        "SkipTermsOfUse": true,
+        "SupportMenu": {
+            "Title": "Wisp Issue Tracker",
+            "URL": "https://github.com/ukkit/wisp-browser/issues"
+        },
+        "UserMessaging": {
+            "UrlbarInterventions": false,
+            "SkipOnboarding": true,
+            "MoreFromMozilla": false,
+            "FirefoxLabs": false
+        },
+        "DisableProfileImport": true,
+        "DisablePocket": true,
+        "DisableDeveloperTools": false,
+        "DefaultSerialGuardSetting": 3,
+        "OverrideFirstRunPage": "",
+        "DNSOverHTTPS": {
+            "Enabled": true,
+            "ProviderURL": "https://base.dns.mullvad.net/dns-query",
+            "Locked": false,
+            "Fallback": true
         },
         "SearchEngines": {
             "PreventInstalls": false,
@@ -111,17 +173,6 @@
                     "IconURL": "data:image/x-icon;base64,AAABAAIAEBAAAAEAIACRAQAAJgAAACAgAAABACAAaQMAALcBAACJUE5HDQoaCgAAAA1JSERSAAAAEAAAABAIBgAAAB/z/2EAAAFYSURBVDiNpdJPS1RxFMbxzx2HkUKnnP4QBC5bBEH7JBKE/ryG1i1cBa2S6A1E9QKqjSu37YpAIkhFRGjXPo1SkizBScppMc8vLjItygOXc+73d85zHn73csio7r66pNqv/mu4h0aGW+hguAjjOEYPzLTD/zQ1MY0bGMd7PMVVTKKLJ3iDW7iSmed4hJ0mbuIihnAB1zCCvTg6j884F9ZK/zqeNXAbU5iNsybuR2gRx+LuHq5jCQ1cRtXAMhawE4HXeJC8FDYfNo+3YfuiVPKZ1Cv4kbpc2LvYhxPJ6+gVgRZOp16rsSL6cQD7UHdwNMo9/QuDIziV+lONnUzfWl1gFGPYxWaNdfQ/5UZNoB2BsxgvAmN5utgK62RbF1/CdvE1ix9jrpmDPbzIcHHwM2y75mAbD3En76vVzMsJ+n/lUKz9yuEgVqKd/L046GVjPQaxEt/+wv89fgPfOlBhjwLBfgAAAABJRU5ErkJggolQTkcNChoKAAAADUlIRFIAAAAgAAAAIAgGAAAAc3p69AAAAzBJREFUWIXt1k1oHVUUB/DfvPfyYYMRa2NfoVXqx0JwoyiChGIQjejG0u4Ul67EFuvGIrpQW9y5cCO6EKHoym5soQs3tkoVEnGhK0VFqKlN0qb5aprkjYs783rfnfeaLNyZPwwz99z/PfM/955zZtjC/x0ZHD0zelPSsfFzm+Lc1FeWkedtXtscL8iQc0vxuByGFdQxUMwt9xKU55ksywcL/jWsdxNcCrgbYxjFPcWiP/AlTmMVu/E89qGJNfyME3nmfHZD6giexhPYW4i9gFM4iXmo1WrefeobDRzHAdxXRF5iHw7iLfyC9/BQEugYDma5I/gcz+FNPFIEEeMAnsRrmGm1WqCBx3B/t23ENrxdRHt7D04T7+NRvIgdPXh1vIQ/i6BADR9iqRhfUT3XW5OXr6tiNw4nL+/GU4jcWw4a+Bon8JdwTg/jAwwlC2fwKb7DHrwq5EuKmHcvXsFdidgH8Ts0VmsDc32tlUNuRD6Dy4mABeHsPotsV/GxzrOex6EioBKz+Cji9WFnOVnra63Que3DQinG+EpIshiTmEtsJ/FFYjtfBBRjtS3g2Pg55VXgDiH5SqwXjlcR8+pCDsW8U8U95jUS3goutgWUD6+fHisfR4TaLTErlGGK7RiMxvP4tQtvJAloEVMVAf319q7sTBRfxjSVlnxnInROyJ+UtyvhXSn9dQiI0EzG00ISptils3HNCom5Ee9SzNuMgEtCL+/mOOUtbYI3FfNSAX3C1qYL1hJb1sXxRVxPbDXVgC7E/lIBg0LSpALknR/GAVEtR7z069mv2pr/ThXGGFLt+VOQdRyjbRs5joSm/tr5dPTMaEXAMG6LxmuKmq0vLae82HGrFJrnHUL7VZva43gA49jTSCa362zBK0JyeWf/RMobjsbXS6HHnzkrsS8m79gvfOqH8Ea6Azt0NpdFobxSjOiMbEnRAxJcxURiqwuJPoRnUwFNoRJKLKj2e6rNZUFoMClyfILfesw10yOYxJFiMsM/ukf2U8KbVhxVF0zgBbws/PisCL973+JsNwGTPRzF+LG4eiJpx9/jB+HYWpn8Wl5UVdZ9+X+HjX7nt7CFfwHgod+nXh1W3gAAAABJRU5ErkJggg=="
                 }
             ]
-        },
-        "SkipTermsOfUse": true,
-        "SupportMenu": {
-            "Title": "Wisp Issue Tracker",
-            "URL": "https://github.com/ukkit/wisp-browser/issues"
-        },
-        "DNSOverHTTPS": {
-            "Enabled": true,
-            "ProviderURL": "https://base.dns.mullvad.net/dns-query",
-            "Locked": false,
-            "Fallback": true
         }
     }
 }

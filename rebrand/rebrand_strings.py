@@ -3,30 +3,32 @@ strings, swaps the in-app wolf-logo PNGs, and swaps the inline base64 wolf-logo
 SVG embedded directly in aboutDialog.css.
 
 Text scope (confirmed by auditing every case-sensitive "LibreWolf" occurrence
-in the 152.0-1 omni.ja:
-  - chrome/<locale>/locale/branding/brand.dtd            (104 files)
-  - chrome/<locale>/locale/branding/brand.properties     (104 files)
-  - localization/<locale>/branding/brand.ftl             (104 files)
-  - chrome/<locale>/locale/browser/appstrings.properties (104 files, network
+in the 152.0-1 omni.ja; locale count bumped to 105 as of 154.0.1-3, which
+added "ku" (Kurdish) — spot-checked to carry the same 7 files as every other
+locale, no scope changes needed beyond the count):
+  - chrome/<locale>/locale/branding/brand.dtd            (105 files)
+  - chrome/<locale>/locale/branding/brand.properties     (105 files)
+  - localization/<locale>/branding/brand.ftl             (105 files)
+  - chrome/<locale>/locale/browser/appstrings.properties (105 files, network
     error page text, e.g. "LibreWolf can't find the server at %S.")
   - chrome/browser/content/browser/aboutDialog.xhtml     (1 file, the
     About-box wordmark label)
-  - localization/<locale>/browser/aboutDialog.ftl        (104 files checked;
+  - localization/<locale>/browser/aboutDialog.ftl        (105 files checked;
     only ~29 actually contain a literal match — the rest phrase their own
     translation differently. en-US's copy matters regardless, since Fluent
     falls back to it for any locale whose own file doesn't override a
     message.) The "about-librewolf" message itself.
-  - localization/<locale>/browser/preferences/preferences.ftl (104 files
+  - localization/<locale>/browser/preferences/preferences.ftl (105 files
     checked, ~31 contain matches) — the LibreWolf settings-pane *title and
     descriptive text values* (e.g. "librewolf-header = LibreWolf
     Preferences"). NOT the same thing as the pane's lowercase message IDs
     (pane-librewolf-title2, librewolf-header) or its JS/CSS/SVG, which stay
     untouched — see exclusions below.
-  - localization/<locale>/browser/browser.ftl (104 files checked, 10 contain
+  - localization/<locale>/browser/browser.ftl (105 files checked, 10 contain
     a match) — some locales' own translators prefixed the
     "identity-allow-site-data" string with "LibreWolf: ", which en-US's
     source string doesn't even do.
-729 files checked in total (most are no-ops; only the locales whose own
+736 files checked in total (most are no-ops; only the locales whose own
 translation contains a literal match get patched). Every pattern's actual
 in-scope file count is verified at runtime against an expected count (see
 PATTERN_EXPECTED_COUNTS) rather than trusting a single hand-summed total —
@@ -71,14 +73,14 @@ NEW = "Wisp"
 
 # pattern -> expected number of zip entries matching it, checked at runtime.
 PATTERN_EXPECTED_COUNTS = {
-    "chrome/*/locale/branding/brand.dtd": 104,
-    "chrome/*/locale/branding/brand.properties": 104,
-    "localization/*/branding/brand.ftl": 104,
-    "chrome/*/locale/browser/appstrings.properties": 104,
+    "chrome/*/locale/branding/brand.dtd": 105,
+    "chrome/*/locale/branding/brand.properties": 105,
+    "localization/*/branding/brand.ftl": 105,
+    "chrome/*/locale/browser/appstrings.properties": 105,
     "chrome/browser/content/browser/aboutDialog.xhtml": 1,
-    "localization/*/browser/aboutDialog.ftl": 104,
-    "localization/*/browser/preferences/preferences.ftl": 104,
-    "localization/*/browser/browser.ftl": 104,
+    "localization/*/browser/aboutDialog.ftl": 105,
+    "localization/*/browser/preferences/preferences.ftl": 105,
+    "localization/*/browser/browser.ftl": 105,
 }
 TEXT_PATTERNS = list(PATTERN_EXPECTED_COUNTS)
 

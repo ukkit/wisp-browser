@@ -7,7 +7,7 @@ Wisp is a privacy-hardened browser built for personal use — a config overlay o
 
 No engine work, no recompile. Wisp takes the official LibreWolf binary, layers on additional hardening and Wisp branding, and wraps it in an installer.
 
-Latest release: [v2026.0630](https://github.com/ukkit/wisp-browser/releases/tag/v2026.0630) — built on LibreWolf 152.0-1.
+Latest release: [v2026.0829](https://github.com/ukkit/wisp-browser/releases/tag/v2026.0829) — built on LibreWolf 154.0.1-3.
 
 ## What it does
 
