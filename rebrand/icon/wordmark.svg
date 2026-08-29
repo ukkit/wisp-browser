@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Wisp's wordmark, replacing upstream's chrome://branding/content/firefox-wordmark.svg
+     (LibreWolf's own vector-path "librewolf" logotype). Kept at the same viewBox
+     as the original so the New Tab / Private Browsing page CSS that sizes and
+     centers this image (background-size: 200px/250px/105px, no-repeat center
+     center) doesn't need any changes. fill:context-fill matches the original's
+     theming mechanism (-moz-context-properties: fill), so this adapts to
+     light/dark newtab backgrounds the same way. Font is Segoe UI (Windows' —
+     and Firefox on Windows' own — default UI font) with generic fallbacks. -->
+<svg
+   width="350.48819"
+   height="57.414555"
+   viewBox="0 0 350.48819 57.414555"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <text
+     x="175.244095"
+     y="28.7072775"
+     text-anchor="middle"
+     dominant-baseline="central"
+     font-family="Segoe UI, Arial, Helvetica, sans-serif"
+     font-weight="700"
+     font-size="46"
+     style="fill:context-fill"
+     aria-label="Wisp">Wisp</text>
+</svg>

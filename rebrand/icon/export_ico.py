@@ -51,6 +51,15 @@ PNG_PATH = OUT_DIR / "wisp.png"
 OMNI_ICON_DIR = OUT_DIR / "omni-icons"
 OMNI_ICON_SIZES = [16, 32, 48, 64, 128]
 
+# The New Tab / Private Browsing "empty state" logo (chrome://branding/content/
+# about-logo.png + @2x) — a separate asset from the icon<N>.png set above,
+# added upstream since 152.0-1. Displayed at 64px, so 192/384 covers @1x/@2x.
+# Not part of SIZES/wisp.ico: 384 doesn't fit that format's byte-sized
+# dimension field, and Windows never renders an .ico that large anyway.
+ABOUT_LOGO_DIR = OUT_DIR / "about-logo"
+ABOUT_LOGO_SIZES = [192, 384]
+ABOUT_LOGO_STROKE_FRACTION = 0.058  # same ratio as the other large (>=64px) sizes
+
 
 def bezier(p0, c1, c2, p1, t):
     mt = 1 - t
@@ -89,6 +98,11 @@ def draw_icon(size, stroke_frac):
 
 def render_size(size):
     big = draw_icon(size * SUPERSAMPLE, STROKE_FRACTIONS[size])
+    return big.resize((size, size), Image.LANCZOS)
+
+
+def render_about_logo_size(size):
+    big = draw_icon(size * SUPERSAMPLE, ABOUT_LOGO_STROKE_FRACTION)
     return big.resize((size, size), Image.LANCZOS)
 
 
@@ -132,6 +146,12 @@ def main():
     for size in OMNI_ICON_SIZES:
         out = OMNI_ICON_DIR / f"icon{size}.png"
         images[size].save(out)
+        print(f"wrote {out}")
+
+    ABOUT_LOGO_DIR.mkdir(exist_ok=True)
+    for size in ABOUT_LOGO_SIZES:
+        out = ABOUT_LOGO_DIR / f"about-logo-{size}.png"
+        render_about_logo_size(size).save(out)
         print(f"wrote {out}")
 
 

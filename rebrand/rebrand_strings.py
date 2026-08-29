@@ -54,6 +54,25 @@ Icon scope:
     substituting it into the same `url("data:image/svg+xml;base64,...")`
     rule. Confirmed via fingerprint search that this exact data URI is not
     duplicated anywhere else in omni.ja.
+  - chrome/browser/content/branding/about-logo(.png|@2x.png|-private.png|
+    -private@2x.png) and firefox-wordmark.svg — the New Tab / Private
+    Browsing page's "empty state" logo+wordmark, added upstream since
+    152.0-1 (found 2026-08-29: with FirefoxHome content policy-disabled,
+    this becomes the dominant visible thing on those pages instead of being
+    covered up by Top Sites/Highlights). The 4 PNGs are two byte-identical
+    pairs upstream (confirmed via sha256) — replaced with rebrand/icon/
+    about-logo/about-logo-{192,384}.png (export_ico.py, same wisp glyph as
+    the icon<N>.png set, just at the larger sizes this component needs).
+    firefox-wordmark.svg is upstream's own vector-path "librewolf" logotype
+    (drawn as bezier curves, not text — a case-sensitive string search won't
+    find it) — replaced with rebrand/icon/wordmark.svg, an SVG <text> reading
+    "Wisp" at the same viewBox so the CSS that sizes/centers it needs no
+    changes, keeping the original's fill:context-fill theming mechanism.
+    chrome/browser/content/branding/about-logo.svg (a different, unrelated
+    asset used on the welcome screen, profile selector, and "more from
+    Mozilla" pane) is deliberately left untouched — upstream itself ships it
+    as an empty placeholder with no content, so there's no LibreWolf branding
+    there to begin with.
 
 Usage: rebrand_strings.py <path-to-omni.ja> [--dry-run]
 Rewrites the file in place (via a temp file + atomic replace) unless --dry-run.
@@ -89,6 +108,27 @@ ICON_REPLACEMENTS = {
     f"chrome/browser/content/branding/icon{size}.png": ICON_DIR / f"icon{size}.png"
     for size in (16, 32, 48, 64, 128)
 }
+
+# The New Tab / Private Browsing "empty state" logo+wordmark (added upstream
+# since 152.0-1 — visible once FirefoxHome content is policy-disabled, since
+# it's no longer covered up by Top Sites/Highlights). about-logo(-private)
+# and its @2x are byte-identical pairs upstream (confirmed via sha256), so
+# both names get the same rendered PNG.
+ABOUT_LOGO_DIR = Path(__file__).parent / "icon" / "about-logo"
+for _name in ("about-logo.png", "about-logo-private.png"):
+    ICON_REPLACEMENTS[f"chrome/browser/content/branding/{_name}"] = ABOUT_LOGO_DIR / "about-logo-192.png"
+for _name in ("about-logo@2x.png", "about-logo-private@2x.png"):
+    ICON_REPLACEMENTS[f"chrome/browser/content/branding/{_name}"] = ABOUT_LOGO_DIR / "about-logo-384.png"
+
+ICON_REPLACEMENTS["chrome/browser/content/branding/firefox-wordmark.svg"] = (
+    Path(__file__).parent / "icon" / "wordmark.svg"
+)
+
+# chrome/browser/content/branding/about-logo.svg is deliberately left untouched:
+# upstream itself ships it as an empty placeholder (<svg .../> with no content)
+# across several surfaces (welcome screen, profile selector, "more from
+# Mozilla" pane) — it already shows no LibreWolf branding, so there's nothing
+# to rebrand there.
 
 ABOUT_DIALOG_CSS = "chrome/browser/content/browser/aboutDialog.css"
 WISP_SVG = Path(__file__).parent / "icon" / "wisp.svg"
