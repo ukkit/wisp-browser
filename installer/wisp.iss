@@ -110,17 +110,36 @@ Root: HKCU; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueN
 // that path as the upgrade target — silently updating the wrong directory.
 // Delete any AppId registration that doesn't point to the canonical install
 // path before Inno gets a chance to read it.
+//
+// Otherwise (the common case: a real previous Wisp install at the canonical
+// path), Inno itself gives no indication anywhere in the wizard that this is
+// an upgrade rather than a fresh install — it just silently overwrites files.
+// Read the previous DisplayVersion and ask before proceeding, so upgrading
+// over an existing install isn't indistinguishable from installing fresh.
+// Skipped under /SILENT and /VERYSILENT — a scripted install has already
+// decided to proceed, and MsgBox would either block forever or, under
+// /SUPPRESSMSGBOXES, auto-answer in a way that isn't safely predictable here.
 function InitializeSetup(): Boolean;
 var
   UninstKey: String;
   InstallLocation: String;
+  OldVersion: String;
 begin
   Result := True;
   UninstKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
                '{B6E6E6C0-6E6E-4B0F-9C9A-77B6F1B6E6C0}_is1';
   if RegQueryStringValue(HKCU, UninstKey, 'InstallLocation', InstallLocation) then
+  begin
     if CompareText(InstallLocation, ExpandConstant('{localappdata}\Wisp\')) <> 0 then
-      RegDeleteKeyIncludingSubkeys(HKCU, UninstKey);
+      RegDeleteKeyIncludingSubkeys(HKCU, UninstKey)
+    else if not WizardSilent() then
+      if RegQueryStringValue(HKCU, UninstKey, 'DisplayVersion', OldVersion) then
+        if OldVersion <> '{#MyAppVersion}' then
+          if MsgBox('Wisp ' + OldVersion + ' is already installed.' + #13#10 + #13#10 +
+                     'Update it to version {#MyAppVersion}?',
+                     mbConfirmation, MB_YESNO) = IDNO then
+            Result := False;
+  end;
 end;
 
 // Kill any running librewolf.exe before file extraction so in-place upgrades
